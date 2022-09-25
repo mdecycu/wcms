@@ -2,6 +2,7 @@
         <head>
         <title>wcms on replit</title>
         <meta charset="utf-8">
+<meta property="head" content="H1">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700,900" rel="stylesheet">
         <link rel="stylesheet" href="./../cmsimde/static/chimper/fonts/icomoon/style.css">
@@ -94,6 +95,7 @@ img.add_border {
 </head>
 <body>
 <div class='container'><nav>
+        
     <div class="site-wrap">
 
     <div class="site-mobile-menu">
@@ -139,4 +141,92 @@ img.add_border {
           </div>
           
         </header>
-    </nav><section><h1>Site Map</h1><div id="tipue_search_content"></div><ul><li><a href='公佈欄.html'>公佈欄</a><li><a href='雲端與近端.html'>雲端與近端</a><li><a href='cp2022.html'>cp2022</a><li><a href='cad2022.html'>cad2022</a><li><a href='nfulist.html'>nfulist</a><li><a href='About.html'>About</a><li><a href='Onedrive.html'>Onedrive</a><li><a href='USB drive.html'>USB drive</a><li><a href='Brython.html'>Brython</a></li></ul></section></div></body></html>
+    <div id="tipue_search_content">cad2022 << <a href='cad2022.html'>Previous</a> <a href='About.html'>Next</a> >> About<br /><h1>nfulist</h1>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import requests
+import bs4
+
+proxies = {
+        'http': 'http://kmolab:kmolab@[2001:288:6004:17::4]:3128',
+        'https': 'http://kmolab:kmolab@[2001:288:6004:17::4]:3128'
+        }
+
+semester = '1091'
+courseno = '0762'
+column = True
+
+headers = {'X-Requested-With': 'XMLHttpRequest'}
+
+url = 'https://qry.nfu.edu.tw/studlist_ajax.php'
+post_var = {'pselyr': semester, 'pseqno': courseno}
+
+# need to executed through proxy server
+result = requests.post(url, data = post_var, headers = headers, proxies=proxies)
+
+soup = bs4.BeautifulSoup(result.content, 'lxml')
+table = soup.find('table', {'class': 'tbcls'})
+data = []
+rows = table.find_all('tr')
+for row in rows:
+    cols = row.find_all('td')
+    cols = [ele.text.strip() for ele in cols]
+    data.append([ele for ele in cols if ele]) # Get rid of empty values
+output = ""
+for i in data[2:]:
+    #print(i[0])
+    if column == "True":
+        output +=i[0] + "&lt;/br&gt;"
+    else:
+        output +=i[0] + "\n"
+
+print(output)</pre>
+<p></p><br />cad2022 << <a href='cad2022.html'>Previous</a> <a href='About.html'>Next</a> >> About</div>
+        
+    <!-- footer -->
+      <div class="container">
+        <div class="row pt-3 mx-auto">
+            <p>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank" >Colorlib</a>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            </p>
+        </div>
+      </div>
+    <!-- for footer -->
+    
+        </div> <!-- for site wrap -->
+            <!-- <script src="../cmsimde/static/chimper/js/jquery-3.3.1.min.js"></script> -->
+            <script src="../cmsimde/static/chimper/js/jquery-migrate-3.0.1.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/jquery-ui.js"></script>
+            <script src="../cmsimde/static/chimper/js/popper.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/bootstrap.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/owl.carousel.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/jquery.stellar.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/jquery.countdown.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/jquery.magnific-popup.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/bootstrap-datepicker.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/aos.js"></script>
+            <!--
+            <script src="../cmsimde/static/chimper/js/typed.js"></script>
+                    <script>
+                    var typed = new Typed('.typed-words', {
+                    strings: ["Web Apps"," WordPress"," Mobile Apps"],
+                    typeSpeed: 80,
+                    backSpeed: 80,
+                    backDelay: 4000,
+                    startDelay: 1000,
+                    loop: true,
+                    showCursor: true
+                    });
+                    </script>
+            -->
+            <script src="../cmsimde/static/chimper/js/main.js"></script>
+        
+<!-- 啟用 LaTeX equations 編輯 -->
+  <!-- <script>
+  MathJax = {
+    tex: {inlineMath: [['$', '$'], ['\(', '\)']]}
+  };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>-->
+    </body></html>
+        
