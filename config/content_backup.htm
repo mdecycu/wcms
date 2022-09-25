@@ -72,7 +72,44 @@
 <p><a href="https://github.com/Shohrab-Hossain/Tic-Tac-Toe-web">https://github.com/Shohrab-Hossain/Tic-Tac-Toe-web</a></p>
 <p><a href="https://github.com/chfw/brython-pack">https://github.com/chfw/brython-pack</a> </p><h1>cad2022</h1>
 <h1>nfulist</h1>
-<h1>About</h1>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import requests
+import bs4
+
+proxies = {
+        'http': 'http://kmolab:kmolab@[2001:288:6004:17::4]:3128',
+        'https': 'http://kmolab:kmolab@[2001:288:6004:17::4]:3128'
+        }
+
+semester = '1091'
+courseno = '0762'
+column = True
+
+headers = {'X-Requested-With': 'XMLHttpRequest'}
+
+url = 'https://qry.nfu.edu.tw/studlist_ajax.php'
+post_var = {'pselyr': semester, 'pseqno': courseno}
+
+# need to executed through proxy server
+result = requests.post(url, data = post_var, headers = headers, proxies=proxies)
+
+soup = bs4.BeautifulSoup(result.content, 'lxml')
+table = soup.find('table', {'class': 'tbcls'})
+data = []
+rows = table.find_all('tr')
+for row in rows:
+    cols = row.find_all('td')
+    cols = [ele.text.strip() for ele in cols]
+    data.append([ele for ele in cols if ele]) # Get rid of empty values
+output = ""
+for i in data[2:]:
+    #print(i[0])
+    if column == "True":
+        output +=i[0] + "&lt;/br&gt;"
+    else:
+        output +=i[0] + "\n"
+
+print(output)</pre>
+<p></p><h1>About</h1>
 <p>這裡是 <a href="https://mde.tw">https://mde.tw</a> 課程教學的 replit 線上動態網站, 主要用來公布與上課進度有關的短暫訊息內容, 通常只有在上課時段才會開啟.</p>
 <p>wcms for mde.tw on replit</p><h1>Onedrive</h1>
 <p>之後上課的認證 email address 都將使用 @nfu.edu.tw, 大二以上的 @gm 帳號僅當作備用帳號.</p>
