@@ -49,8 +49,65 @@
     })();
 </script>
 </p>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<h1>雲端與近端</h1>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><h2>TCExam</h2>
+<p>nginx 只允許特定 IPv6 網段連線, 且將 http 用戶跳轉至 https 設定:</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">    server {
+        listen       [::]:80 default ipv6only=on;
+        server_name  domain.cycu.org;
+        #return       301 https://$server_name$request_uri;
+        
+        allow 2001:288:6004:xx::0/32;
+        deny all;
+	
+	return 302 https://domain.cycu.org;
+        
+        #location /{
+            #root C:/tcexam/downloads;
+            #auth_basic "For Authorized Users Only!";
+            #auth_basic_user_file C:/tcexam/nginx-1.20.1/.htpasswd;
+        #}
+    }</pre>
+<p>nginx 執行 php 解譯設定:</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">server { 
+    listen    [::]:443 default ssl ipv6only=on;
+    
+    root C:/tcexam_dir/tcexam;
+
+    server_name    domain.cycu.org;
+    ssl_certificate    C:/tcexam_dir/fullchain.pem;
+    ssl_certificate_key    C:/tcexam_dir/privkey.pem;
+    ssl_protocols    TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers    HIGH:!aNULL:!MD5;
+    
+    allow 2001:288:6004:xx::0/32;
+    deny all;
+    
+    location /{ 
+        index index.html index.php;
+    }
+    
+    location ~ \.php$ {
+        fastcgi_pass   127.0.0.1:9123;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+    }
+}</pre>
+<p>fastcgi 在 port 9123 啟動的 batch file:</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">@ECHO OFF
+ECHO Starting PHP FastCGI...
+set PATH=C:\PHP8.1.7;%PATH%
+c:\PHP8.1.7\RunHiddenConsole.exe C:\PHP8.1.7\php-cgi.exe -b 127.0.0.1:9123</pre>
+<p>若採用 nssm 建立服務, 則透過下列設定建立:</p>
+<p>nssm install php 建立 php 服務.</p>
+<p>nssm edit php 則用來編輯服務.</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">Path: C:\tcexam_dir\php8.1.7\php-cgi.exe
+
+Startup Directory: C:\tcexam_dir\php8.1.7
+
+Arguments: -b 127.0.0.1:9123</pre>
+<p><br/><br/></p>
+<p></p><h1>雲端與近端</h1>
 <h4><span data-contrast="none"><span>雲端版工具:</span></span></h4>
 <p><span data-contrast="none"><span>分散式版次管理系統:  - 登入<a href="https://github.com/"> <span style="color: #ff0000;">github</span></a> (靜態網站)</span></span><span> </span></p>
 <p><span data-contrast="none"><span>雲端整合程式開發環境: - 登入 <span style="color: #ff0000;"><a href="https://replit.com" style="color: #ff0000;">replit</a></span> (雲端動態網站)</span></span><span> </span></p>
@@ -71,6 +128,11 @@
 <h1>cp2022</h1>
 <p><a href="https://nfu.cycu.org/?semester=1111&amp;courseno=0747&amp;column=True">1a 計算機程式修課學員名單</a> (取自教務主機)</p>
 <p><a href="https://nfu.cycu.org/?semester=1111&amp;courseno=0761&amp;column=True">1b 計算機程式修課學員名單</a><span><span> </span></span><span>(取自教務主機)</span></p>
+<div>
+<div><a href="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/EQPaqjqHN45EjaCr336Co1gB0EnqiOfZgWFfuISc3NcP5w?e=d0z6xc&amp;isSPOFile=1" rel="noreferrer noopener" tabindex="-1" target="_blank" title="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/eqpaqjqhn45ejacr336co1gb0enqiofzgwffuisc3ncp5w?e=d0z6xc">1a 學號與 Github 帳號對照表</a></div>
+<div><a href="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/Efm2pg72G3lLsY8yDD1WhV0BPjCwxti2hIjGeZeKHHTvTw?e=vMdhjT" rel="noreferrer noopener" tabindex="-1" target="_blank" title="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/efm2pg72g3llsy8ydd1whv0bpjcwxti2hijgezekhhtvtw?e=vmdhjt">1b 學號與 Github 帳號對照表</a></div>
+<div><hr/></div>
+</div>
 <p><a href="https://github.com/Shohrab-Hossain/Tic-Tac-Toe-web">https://github.com/Shohrab-Hossain/Tic-Tac-Toe-web</a></p>
 <p><a href="https://github.com/chfw/brython-pack">https://github.com/chfw/brython-pack</a></p>
 <p>利用下列網際程式架構, 可以設法取出教務主機所有公開資料.</p>
@@ -140,6 +202,11 @@ if __name__ == '__main__':
 <p></p><h1>cad2022</h1>
 <p><a href="https://nfu.cycu.org/?semester=1111&amp;courseno=0773&amp;column=True">2a 電腦輔助設計與實習修課學員名單</a><span><span> </span></span><span>(取自教務主機)</span></p>
 <p><span><a href="https://nfu.cycu.org/?semester=1111&amp;courseno=0786&amp;column=True">2b 電腦輔助設計與實習修課學員名單</a><span><span> </span></span><span>(取自教務主機)</span></span></p>
+<div>
+<div><a href="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/EW8X2fxXZLNDrMMwTOCMj7kBc5Sy7fUiC6j5bX4WCenprg?e=RArMBW&amp;isSPOFile=1" rel="noreferrer noopener" tabindex="-1" target="_blank" title="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/ew8x2fxxzlndrmmwtocmj7kbc5sy7fuic6j5bx4wcenprg?e=rarmbw">2a 學號與 Github 帳號對照表</a></div>
+<div><a href="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/Ec0bGLTPPg9OqlWTMSFy6EsBJhQX0H6zlzoczTj4wjVLQg?e=PBj7Yu" rel="noreferrer noopener" tabindex="-1" target="_blank" title="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/ec0bgltppg9oqlwtmsfy6esbjhqx0h6zlzocztj4wjvlqg?e=pbj7yu">2b 學號與 Github 帳號對照表</a></div>
+<div><hr/></div>
+</div>
 <p>擷取學員名單程式碼:</p>
 <pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">from flask import Flask, request 
 from flask_cors import CORS
@@ -241,9 +308,88 @@ for i in data[2:]:
         output +=i[0] + "\n"
 
 print(output)</pre>
+<p>Web based:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false"># 以 Flask 作為網際框架, 
+from flask import Flask, request
+# 允許跨網站擷取資料
+from flask_cors import CORS
+
+# 利用 requests 取回網站中的頁面資料
+import requests
+# 利用 beautifulsoup 解讀超文件網頁內容
+import bs4
+# 若在近端啟動也要採用 SSL 時導入
+#import ssl
+  
+'''
+2022 Fall 各班課程代號
+1a - 2b
+?semester=1111&amp;courseno=0747&amp;column=True 
+
+?semester=1111&amp;courseno=0761&amp;column=True 
+
+?semester=1111&amp;courseno=0773&amp;column=True 
+
+?semester=1111&amp;courseno=0786&amp;column=True 
+
+'''
+proxies ={
+'http': 'http://account:password@[2001:288:6004:17::4]:3128',
+'https': 'http://account:password@[2001:288:6004:17::4]:3128'
+}
+
+app = Flask(__name__)
+CORS(app)
+  
+@app.route('/studlist')
+@app.route('/')
+def studlist():
+    semester = request.args.get('semester')
+    courseno = request.args.get('courseno')
+    column = request.args.get('column')
+
+    if semester == None:
+        semester = '1091'
+    if courseno == None:
+        courseno = '0762'
+    
+    headers = {'X-Requested-With': 'XMLHttpRequest'}
+
+    url = 'https://qry.nfu.edu.tw/studlist_ajax.php'
+    post_var = {'pselyr': semester, 'pseqno': courseno}
+    
+    # 可透過 Proxy server 執行程式
+    #result = requests.post(url, data = post_var, headers = headers, proxies = proxies)
+    result = requests.post(url, data = post_var, headers = headers)
+    soup = bs4.BeautifulSoup(result.content, 'lxml')
+    table = soup.find('table', {'class': 'tbcls'})
+    data = []
+    rows = table.find_all('tr')
+    for row in rows:
+        cols = row.find_all('td')
+        cols = [ele.text.strip() for ele in cols]
+        data.append([ele for ele in cols if ele]) # Get rid of empty values
+    output = ""
+    for i in data[2:]:
+        #print(i[0])
+        if column == "True":
+            output +=i[0] + "&lt;/br&gt;"
+        else:
+            output +=i[0] + "\n"
+        
+    return output
+    #return  str(pselyr) + " + " +str(pseqno)
+  
+# 即使在近端仍希望以 https 模式下執行
+#context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+#context.load_cert_chain('localhost.crt', 'localhost.key')
+  
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=8080, debug=True)</pre>
 <p></p><h1>About</h1>
 <p>這裡是 <a href="https://mde.tw">https://mde.tw</a> 課程教學的 replit 線上動態網站, 主要用來公布與上課進度有關的短暫訊息內容, 通常只有在上課時段才會開啟.</p>
-<p>wcms for mde.tw on replit</p><h1>Onedrive</h1>
+<p>wcms for mde.tw on replit</p>
+<p><a href="https://robodk.com/downloads/Install-RoboDK-64-v4.2.4.exe">https://robodk.com/downloads/Install-RoboDK-64-v4.2.4.exe</a> </p><h1>Onedrive</h1>
 <p>之後上課的認證 email address 都將使用 @nfu.edu.tw, 大二以上的 @gm 帳號僅當作備用帳號.</p>
 <p>若兩個信箱都至 <a href="https://www.microsoft.com/zh-tw/education/products/office">https://www.microsoft.com/zh-tw/education/products/office</a> 註冊, 將可各取得 5TB 的雲端儲存空間.</p>
 <h1>USB drive</h1>

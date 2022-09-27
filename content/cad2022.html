@@ -130,7 +130,7 @@ img.add_border {
                             <li><a href="./../blog/index.html">blog</a></li>
                         </ul>
                       </li>
-                     <li><a href='公佈欄.html'>公佈欄</a><li><a href='雲端與近端.html'>雲端與近端</a><li><a href='cp2022.html'>cp2022</a><li><a href='cad2022.html'>cad2022</a><li><a href='nfulist.html'>nfulist</a><li><a href='About.html'>About</a><li><a href='Onedrive.html'>Onedrive</a><li><a href='USB drive.html'>USB drive</a><li><a href='Brython.html'>Brython</a></li>
+                     <li class='has-children'><a href='公佈欄.html'>公佈欄</a><ul class='dropdown'><li><a href='TCExam.html'>TCExam</a></li></ul><li><a href='雲端與近端.html'>雲端與近端</a><li><a href='cp2022.html'>cp2022</a><li><a href='cad2022.html'>cad2022</a><li><a href='nfulist.html'>nfulist</a><li><a href='About.html'>About</a><li><a href='Onedrive.html'>Onedrive</a><li><a href='USB drive.html'>USB drive</a><li><a href='Brython.html'>Brython</a></li>
                       </ul>
                 </nav>
               </div>
@@ -144,6 +144,11 @@ img.add_border {
     <div id="tipue_search_content">cp2022 << <a href='cp2022.html'>Previous</a> <a href='nfulist.html'>Next</a> >> nfulist<br /><h1>cad2022</h1>
 <p><a href="https://nfu.cycu.org/?semester=1111&amp;courseno=0773&amp;column=True">2a 電腦輔助設計與實習修課學員名單</a><span><span> </span></span><span>(取自教務主機)</span></p>
 <p><span><a href="https://nfu.cycu.org/?semester=1111&amp;courseno=0786&amp;column=True">2b 電腦輔助設計與實習修課學員名單</a><span><span> </span></span><span>(取自教務主機)</span></span></p>
+<div>
+<div><a href="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/EW8X2fxXZLNDrMMwTOCMj7kBc5Sy7fUiC6j5bX4WCenprg?e=RArMBW&amp;isSPOFile=1" rel="noreferrer noopener" tabindex="-1" target="_blank" title="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/ew8x2fxxzlndrmmwtocmj7kbc5sy7fuic6j5bx4wcenprg?e=rarmbw">2a 學號與 Github 帳號對照表</a></div>
+<div><a href="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/Ec0bGLTPPg9OqlWTMSFy6EsBJhQX0H6zlzoczTj4wjVLQg?e=PBj7Yu" rel="noreferrer noopener" tabindex="-1" target="_blank" title="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/ec0bgltppg9oqlwtmsfy6esbjhqx0h6zlzocztj4wjvlqg?e=pbj7yu">2b 學號與 Github 帳號對照表</a></div>
+<div><hr/></div>
+</div>
 <p>擷取學員名單程式碼:</p>
 <pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">from flask import Flask, request 
 from flask_cors import CORS

@@ -2,7 +2,7 @@
         <head>
         <title>wcms on replit</title>
         <meta charset="utf-8">
-<meta property="head" content="H1">
+<meta property="head" content="H2">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700,900" rel="stylesheet">
         <link rel="stylesheet" href="./../cmsimde/static/chimper/fonts/icomoon/style.css">
@@ -141,81 +141,65 @@ img.add_border {
           </div>
           
         </header>
-    <div id="tipue_search_content">雲端與近端 << <a href='雲端與近端.html'>Previous</a> <a href='cad2022.html'>Next</a> >> cad2022<br /><h1>cp2022</h1>
-<p><a href="https://nfu.cycu.org/?semester=1111&amp;courseno=0747&amp;column=True">1a 計算機程式修課學員名單</a> (取自教務主機)</p>
-<p><a href="https://nfu.cycu.org/?semester=1111&amp;courseno=0761&amp;column=True">1b 計算機程式修課學員名單</a><span><span> </span></span><span>(取自教務主機)</span></p>
-<div>
-<div><a href="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/EQPaqjqHN45EjaCr336Co1gB0EnqiOfZgWFfuISc3NcP5w?e=d0z6xc&amp;isSPOFile=1" rel="noreferrer noopener" tabindex="-1" target="_blank" title="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/eqpaqjqhn45ejacr336co1gb0enqiofzgwffuisc3ncp5w?e=d0z6xc">1a 學號與 Github 帳號對照表</a></div>
-<div><a href="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/Efm2pg72G3lLsY8yDD1WhV0BPjCwxti2hIjGeZeKHHTvTw?e=vMdhjT" rel="noreferrer noopener" tabindex="-1" target="_blank" title="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/efm2pg72g3llsy8ydd1whv0bpjcwxti2hijgezekhhtvtw?e=vmdhjt">1b 學號與 Github 帳號對照表</a></div>
-<div><hr/></div>
-</div>
-<p><a href="https://github.com/Shohrab-Hossain/Tic-Tac-Toe-web">https://github.com/Shohrab-Hossain/Tic-Tac-Toe-web</a></p>
-<p><a href="https://github.com/chfw/brython-pack">https://github.com/chfw/brython-pack</a></p>
-<p>利用下列網際程式架構, 可以設法取出教務主機所有公開資料.</p>
-<p>擷取學員名單程式碼:</p>
-<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">from flask import Flask, request 
-from flask_cors import CORS
-  
-import requests
-import bs4
-#import ssl
-  
-'''
-1a - 2b
-?semester=1111&amp;courseno=0747&amp;column=True 
-
-?semester=1111&amp;courseno=0761&amp;column=True 
-
-?semester=1111&amp;courseno=0773&amp;column=True 
-
-?semester=1111&amp;courseno=0786&amp;column=True 
-'''
-
-app = Flask(__name__)
-CORS(app)
-  
-@app.route('/studlist')
-@app.route('/')
-def studlist():
-    semester = request.args.get('semester')
-    courseno = request.args.get('courseno')
-    column = request.args.get('column')
-
-    if semester == None:
-        semester = '1091'
-    if courseno == None:
-        courseno = '0762'
-    
-    headers = {'X-Requested-With': 'XMLHttpRequest'}
-
-    url = 'https://qry.nfu.edu.tw/studlist_ajax.php'
-    post_var = {'pselyr': semester, 'pseqno': courseno}
-  
-    result = requests.post(url, data = post_var, headers = headers)
-    soup = bs4.BeautifulSoup(result.content, 'lxml')
-    table = soup.find('table', {'class': 'tbcls'})
-    data = []
-    rows = table.find_all('tr')
-    for row in rows:
-        cols = row.find_all('td')
-        cols = [ele.text.strip() for ele in cols]
-        data.append([ele for ele in cols if ele]) # Get rid of empty values
-    output = ""
-    for i in data[2:]:
-        if column == "True":
-            output +=i[0] + "&lt;/br&gt;"
-        else:
-            output +=i[0] + "\n"
+    <div id="tipue_search_content">公佈欄 << <a href='公佈欄.html'>Previous</a> <a href='雲端與近端.html'>Next</a> >> 雲端與近端<br /><h1>TCExam</h1>
+<p>nginx 只允許特定 IPv6 網段連線, 且將 http 用戶跳轉至 https 設定:</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">    server {
+        listen       [::]:80 default ipv6only=on;
+        server_name  domain.cycu.org;
+        #return       301 https://$server_name$request_uri;
         
-    return output
-  
-# 即使在近端仍希望以 https 模式下執行
-#context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-#context.load_cert_chain('localhost.crt', 'localhost.key')
-  
-if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=8080, debug=True)</pre>
-<p></p><br />雲端與近端 << <a href='雲端與近端.html'>Previous</a> <a href='cad2022.html'>Next</a> >> cad2022</div>
+        allow 2001:288:6004:xx::0/32;
+        deny all;
+	
+	return 302 https://domain.cycu.org;
+        
+        #location /{
+            #root C:/tcexam/downloads;
+            #auth_basic "For Authorized Users Only!";
+            #auth_basic_user_file C:/tcexam/nginx-1.20.1/.htpasswd;
+        #}
+    }</pre>
+<p>nginx 執行 php 解譯設定:</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">server { 
+    listen    [::]:443 default ssl ipv6only=on;
+    
+    root C:/tcexam_dir/tcexam;
+
+    server_name    domain.cycu.org;
+    ssl_certificate    C:/tcexam_dir/fullchain.pem;
+    ssl_certificate_key    C:/tcexam_dir/privkey.pem;
+    ssl_protocols    TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers    HIGH:!aNULL:!MD5;
+    
+    allow 2001:288:6004:xx::0/32;
+    deny all;
+    
+    location /{ 
+        index index.html index.php;
+    }
+    
+    location ~ \.php$ {
+        fastcgi_pass   127.0.0.1:9123;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+    }
+}</pre>
+<p>fastcgi 在 port 9123 啟動的 batch file:</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">@ECHO OFF
+ECHO Starting PHP FastCGI...
+set PATH=C:\PHP8.1.7;%PATH%
+c:\PHP8.1.7\RunHiddenConsole.exe C:\PHP8.1.7\php-cgi.exe -b 127.0.0.1:9123</pre>
+<p>若採用 nssm 建立服務, 則透過下列設定建立:</p>
+<p>nssm install php 建立 php 服務.</p>
+<p>nssm edit php 則用來編輯服務.</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">Path: C:\tcexam_dir\php8.1.7\php-cgi.exe
+
+Startup Directory: C:\tcexam_dir\php8.1.7
+
+Arguments: -b 127.0.0.1:9123</pre>
+<p><br/><br/></p>
+<p></p><br />公佈欄 << <a href='公佈欄.html'>Previous</a> <a href='雲端與近端.html'>Next</a> >> 雲端與近端</div>
         
     <!-- footer -->
       <div class="container">
