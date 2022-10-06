@@ -130,7 +130,7 @@ img.add_border {
                             <li><a href="./../blog/index.html">blog</a></li>
                         </ul>
                       </li>
-                     <li class='has-children'><a href='公佈欄.html'>公佈欄</a><ul class='dropdown'><li><a href='TCExam.html'>TCExam</a><li><a href='雲端與近端.html'>雲端與近端</a></li></ul><li class='has-children'><a href='cp2022.html'>cp2022</a><ul class='dropdown'><li><a href='cp 抽點.html'>cp 抽點</a></li></ul><li class='has-children'><a href='cad2022.html'>cad2022</a><ul class='dropdown'><li><a href='cad 抽點.html'>cad 抽點</a><li><a href='Control.html'>Control</a></li></ul><li class='has-children'><a href='About.html'>About</a><ul class='dropdown'><li><a href='nfulist.html'>nfulist</a><li><a href='Onedrive.html'>Onedrive</a><li><a href='USB drive.html'>USB drive</a><li><a href='Ubuntu.html'>Ubuntu</a><li><a href='mde.html'>mde</a></li></ul><li><a href='TCExam_error.html'>TCExam_error</a><li><a href='Brython.html'>Brython</a></li>
+                     <li class='has-children'><a href='公佈欄.html'>公佈欄</a><ul class='dropdown'><li><a href='TCExam.html'>TCExam</a><li><a href='雲端與近端.html'>雲端與近端</a></li></ul><li class='has-children'><a href='cp2022.html'>cp2022</a><ul class='dropdown'><li><a href='cp 抽點.html'>cp 抽點</a></li></ul><li class='has-children'><a href='cad2022.html'>cad2022</a><ul class='dropdown'><li><a href='stud for cad.html'>stud for cad</a><li><a href='cad 抽點.html'>cad 抽點</a><li><a href='NX.html'>NX</a><li><a href='Control.html'>Control</a></li></ul><li class='has-children'><a href='About.html'>About</a><ul class='dropdown'><li><a href='nfulist.html'>nfulist</a><li><a href='Onedrive.html'>Onedrive</a><li><a href='USB drive.html'>USB drive</a><li><a href='Ubuntu.html'>Ubuntu</a><li><a href='mde.html'>mde</a></li></ul><li><a href='TCExam_error.html'>TCExam_error</a><li><a href='Brython.html'>Brython</a></li>
                       </ul>
                 </nav>
               </div>
@@ -165,6 +165,22 @@ cert = fullchain.pem
 key = privkey.pem
 TIMEOUTclose = 0</pre>
 <p>/etc/init.d/stunnel4 restart</p>
+<p>Add bulk user in Ubuntu:</p>
+<p><a href="https://www.tutorialspoint.com/how-to-create-multiple-user-accounts-in-linux">https://www.tutorialspoint.com/how-to-create-multiple-user-accounts-in-linux</a></p>
+<hr/>
+<p>Get user id:<br/><br/>cut -d: -f1,3 /etc/passwd<br/><br/>    -d: sets the delimiter as : for cut<br/><br/>    -f1,3 extracts the field 1 and 3 only delimited by : from the /etc/passwd file</p>
+<hr/>
+<p>Create new user:</p>
+<p>users.txt</p>
+<p style="padding-left: 30px;">user_1:password_2:1002:1002:user_1:/home/user_1:/bin/bash</p>
+<p>sudo newusers users.txt</p>
+<hr/>
+<p>Get IPv6 address:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import socket
+
+ip = socket.getaddrinfo("stud.cycu.org", 0, socket.AF_INET6)[0][4][0]
+
+print(ip)</pre>
 <p></p><br />USB drive << <a href='USB drive.html'>Previous</a> <a href='mde.html'>Next</a> >> mde</div>
         
     <!-- footer -->

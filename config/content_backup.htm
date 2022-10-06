@@ -1,4 +1,5 @@
 <h1>公佈欄</h1>
+<p>stud.cycu.org 伺服器 <a href="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/ET-JZNPkNtZDhFiLt8BGZZ4BFMVV1HE73WQt1V44y6vnCQ?e=fQeO7i">port 分配表</a>.</p>
 <p>w4 開始, 各班先進教室的學員, 可以往前面自己選電腦位置上課, <span style="color: #ff0000;">不再按照學號固定座位</span>.</p>
 <hr/>
 <div>大二學制以上同學要取得 @nfu.edu.tw 電子郵箱登記的 Onedrive 帳號管理步驟:</div>
@@ -50,8 +51,7 @@
     })();
 </script>
 </p>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<h2>TCExam</h2>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><h2>TCExam</h2>
 <p>nginx 只允許特定 IPv6 網段連線, 且將 http 用戶跳轉至 https 設定:</p>
 <pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">    server {
         listen       [::]:80 default ipv6only=on;
@@ -301,6 +301,8 @@ def studlist():
   
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)</pre>
+<h2>stud for cad</h2>
+<p></p>
 <h2>cad 抽點</h2>
 <pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false"># Python 的註解分為單行註解與多行, 單行註解可在字串前方放入 #
 '''多行註解則可以透過三個單引號前後標註字串或文字段落內容, 
@@ -329,7 +331,9 @@ num = 5
 for i in range(num):
     print(stud[i])</pre>
 <p><a href="/get_page/Brython?src=https://gist.githubusercontent.com/mdecycu/2c6323eff49b496d1bafd210f3ec9707/raw/a35e9c4f72970911deeb8fc488b256ca7d19ae24/cad2a_2022_random_draw.py">cad a 抽點</a></p>
-<p><a href="/get_page/Brython?src=https://gist.githubusercontent.com/mdecycu/2c6323eff49b496d1bafd210f3ec9707/raw/a35e9c4f72970911deeb8fc488b256ca7d19ae24/cad2b_2022_random_draw.py">cad b 抽點</a></p><h2>Control</h2>
+<p><a href="/get_page/Brython?src=https://gist.githubusercontent.com/mdecycu/2c6323eff49b496d1bafd210f3ec9707/raw/a35e9c4f72970911deeb8fc488b256ca7d19ae24/cad2b_2022_random_draw.py">cad b 抽點</a></p><h2>NX</h2>
+<p>File -&gt; Utilities -&gt; Customer Defaults -&gt; General -&gt; Miscellaneous -&gt; Product Excellence Program</p>
+<h2>Control</h2>
 <p><a href="https://github.com/sooryamsharma/Hand-Gesture-Controlled-Drone">https://github.com/sooryamsharma/Hand-Gesture-Controlled-Drone</a></p>
 <p></p><h1>About</h1>
 <p>這裡是 <a href="https://mde.tw">https://mde.tw</a> 課程教學的 replit 線上動態網站, 主要用來公布與上課進度有關的短暫訊息內容, 通常只有在上課時段才會開啟.</p>
@@ -514,14 +518,42 @@ if __name__ == '__main__':
 <p>列出網卡代號:</p>
 <p>sudo ls /sys/class/net</p>
 <p>例如: 虛擬主機 Ubuntu 22.04 網卡代號為 enp0s3</p>
-<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false"># pip install waitress
-from waitress import serve
+<p>一般 user 可以自行在倉儲根目錄配置 waitreee_server, 並在近端以特定 port 執行啟動. 然後再由 Stunnel 轉接至外部連線.</p>
+<h4>waitress</h4>
+<p>直接在倉儲根目錄建立 waitress_server.py</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">from waitress import serve
+from cmsimde import flaskapp
 
-# under cmsimde import fossilapp
-import fossilapp
+serve(flaskapp.app, listen="127.0.0.1:9443")</pre>
+<p>表示要在 127.0.0.1:9443 執行 flaskapp.app, 然後透過 Stunnel 接收 9443 資料, 讓外部以 443 連接</p>
+<p>Stunnel</p>
+<p>安裝 <a href="https://www.stunnel.org/">stunnel</a> 也很簡單, 只要執行 sudo apt install stunnel4 即可, 安裝後若要隨系統開機啟動, 則需要 sudo vi /etc/default/stunnel4, 並在檔案中加入 ENABLED=1 後存檔.</p>
+<p>另外, 還需要 sudo vi /etc/environment, 並在檔案中加入 HTTPS=on 後存檔.</p>
+<p>接下來為了由 <a href="https://www.stunnel.org/">stunnel</a> 代理 <a href="https://www.fossil-scm.org">Fossil SCM</a> 的 https 伺服, 必須加入 /etc/stunnel/stunnel.conf</p>
+<p>stunnel.conf</p>
+<pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">[https]
+accept = stud.cycu.org:443
+connect = 127.0.0.1:9443
+cert = fullchain.pem
+key = privkey.pem
+TIMEOUTclose = 0</pre>
+<p>/etc/init.d/stunnel4 restart</p>
+<p>Add bulk user in Ubuntu:</p>
+<p><a href="https://www.tutorialspoint.com/how-to-create-multiple-user-accounts-in-linux">https://www.tutorialspoint.com/how-to-create-multiple-user-accounts-in-linux</a></p>
+<hr/>
+<p>Get user id:<br/><br/>cut -d: -f1,3 /etc/passwd<br/><br/>    -d: sets the delimiter as : for cut<br/><br/>    -f1,3 extracts the field 1 and 3 only delimited by : from the /etc/passwd file</p>
+<hr/>
+<p>Create new user:</p>
+<p>users.txt</p>
+<p style="padding-left: 30px;">user_1:password_2:1002:1002:user_1:/home/user_1:/bin/bash</p>
+<p>sudo newusers users.txt</p>
+<hr/>
+<p>Get IPv6 address:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import socket
 
-# run cmsimde dynamic site with production waitress
-serve(fossilapp.app, host='0.0.0.0', port=5000, url_scheme='https')</pre>
+ip = socket.getaddrinfo("stud.cycu.org", 0, socket.AF_INET6)[0][4][0]
+
+print(ip)</pre>
 <p></p><h2>mde</h2>
 <p><a href="https://web.archive.org/web/19981202031321/http://www.mde.nhit.edu.tw/">https://web.archive.org/web/19981202031321/http://www.mde.nhit.edu.tw/</a></p><h1>TCExam_error</h1>
 <p>ATTENTION: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated | LINE: 793 | FILE: C:\tcexam\tcexam\admin\code\tce_edit_answer.php</p>

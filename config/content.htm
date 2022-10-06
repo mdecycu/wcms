@@ -1,4 +1,5 @@
 <h1>公佈欄</h1>
+<p>stud.cycu.org 伺服器 <a href="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/ET-JZNPkNtZDhFiLt8BGZZ4BFMVV1HE73WQt1V44y6vnCQ?e=fQeO7i">port 分配表</a>.</p>
 <p>w4 開始, 各班先進教室的學員, 可以往前面自己選電腦位置上課, <span style="color: #ff0000;">不再按照學號固定座位</span>.</p>
 <hr/>
 <div>大二學制以上同學要取得 @nfu.edu.tw 電子郵箱登記的 Onedrive 帳號管理步驟:</div>
@@ -50,8 +51,7 @@
     })();
 </script>
 </p>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<h2>TCExam</h2>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><h2>TCExam</h2>
 <p>nginx 只允許特定 IPv6 網段連線, 且將 http 用戶跳轉至 https 設定:</p>
 <pre class="brush:js;auto-links:false;toolbar:false" contenteditable="false">    server {
         listen       [::]:80 default ipv6only=on;
@@ -301,7 +301,20 @@ def studlist():
   
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)</pre>
-<h2>cad 抽點</h2>
+<h2>stud for cad</h2>
+<ol style="font-weight: 400;">
+<li data-aria-level="1" data-aria-posinset="1"><span data-contrast="auto"><span>(登入 stud.cycu.org)利用 @nfu 電子郵箱收到的帳號與密碼, 登入 stud.cycu.org:  在命令列視窗, 以 ssh </span></span><span data-contrast="auto"><span>cad學號@stud.cycu.org , 輸入對應密後, 可以登入系統</span></span><span> </span></li>
+<li data-aria-level="1" data-aria-posinset="2"><a href="https://nfuedu-my.sharepoint.com/:x:/g/personal/yen_nfu_edu_tw/ET-JZNPkNtZDhFiLt8BGZZ4BFMVV1HE73WQt1V44y6vnCQ"><span data-contrast="auto"><span>查詢</span></span></a><span data-contrast="auto"><span> stud.cycu.org 中與帳號對應的近端 (給 127.0.0.1 使用) 與遠端 (給 stud.cycu.org) 埠號</span></span><span> </span></li>
+<li data-aria-level="1" data-aria-posinset="3"><span data-contrast="auto"><span>(透過 sftp 建立近端目錄與 stud.cycu.org 帳號下的對應)  開啟另一個命令列, 執行 sftp </span></span><a href="mailto:%E5%B8%B3%E8%99%9F@stud.cycu.org"><span data-contrast="auto"><span>帳號@stud.cycu.org</span></span></a><span data-contrast="auto"><span>   </span></span><span data-contrast="auto"><span>輸入對應密碼, 即可建立近端目錄與遠端系統目錄間的對應.</span></span><span> </span></li>
+<li data-aria-level="1" data-aria-posinset="4"><span data-contrast="auto"><span>與在近端(Windows)利用  SSH 建立 public/private keys 流程相同, 必須在 Linux (Ubuntu) 利用 ssh-keygen 建立 keys. 所產生的 id_rsa 為 private key, 而 id_rsa.pub 為 public key, 都位於 .ssh 目錄下.</span></span><span> </span></li>
+<li data-aria-level="1" data-aria-posinset="5"><span data-contrast="auto"><span>利用 sftp  進入 stud.cycu.org 後, cd 到 .ssh, 以 get id_rsa.pub 將 public key 取至  Windows 後, 送到 Github -&gt; Settings -&gt; SSH and GPG 設定區, 透過 new key 登錄公鑰.</span></span><span> </span></li>
+<li data-aria-level="1" data-aria-posinset="6"><span data-contrast="auto"><span>接下來要下載  </span></span><a href="https://nfuedu.sharepoint.com/:u:/s/cad2022/EQlQii99WuZEl2_6YB_WK28BgZ3sBCVZnmLjLFJS5kXuPQ?e=0i7OKP"><span data-contrast="auto"><span>config</span></span></a><span data-contrast="auto"><span> 設定檔案,  以 sftp 放入 stud.cycu.org 主機的 .ssh 目錄中.</span></span><span> </span></li>
+<li data-aria-level="1" data-aria-posinset="7"><span data-contrast="auto"><span>在 stud.cycu.org 中, 以 git clone --recurse-submodules  </span></span><a href="mailto:git@github.com:mdecad2022/site-%E5%80%8B%E4%BA%BAgithub%E5%B8%B3%E8%99%9F.git"><span data-contrast="auto"><span>git@github.com:mdecad2022/site-個人github帳號.git</span></span></a><span data-contrast="auto"><span>   取下個人倉儲.</span></span><span> </span></li>
+<li data-aria-level="1" data-aria-posinset="8"><span data-contrast="auto"><span>接著下載 server.py, 在 Windows 編輯 server.py, 將個人分配到的 9xxxx 埠號填入後存檔, 以 sftp 放入上列取下的倉儲根目錄.</span></span><span> </span></li>
+<li data-aria-level="1" data-aria-posinset="9"><span data-contrast="auto"><span>在 stud.cycu.org 系統中, 進入倉儲 (site-github帳號) 後, 執行 python3 server.py, 就可啟用動態網站.</span></span><span> </span></li>
+<li data-aria-level="1" data-aria-posinset="10"><span data-contrast="auto"><span>設定完成後, 各學員將會有一個廣域網路上的動態網站 (取代 Replit 上的動態網站), </span></span><a href="https://stud.cycu.org:8xxxx"><span data-contrast="auto"><span>https://stud.cycu.org:8xxxx</span></span></a><span data-contrast="auto"><span>   看到個人的動態網站.</span></span><span> </span></li>
+</ol>
+<p></p><h2>cad 抽點</h2>
 <pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false"># Python 的註解分為單行註解與多行, 單行註解可在字串前方放入 #
 '''多行註解則可以透過三個單引號前後標註字串或文字段落內容, 
 也可以使用三個雙引號作為多行註解的標註
@@ -329,7 +342,9 @@ num = 5
 for i in range(num):
     print(stud[i])</pre>
 <p><a href="/get_page/Brython?src=https://gist.githubusercontent.com/mdecycu/2c6323eff49b496d1bafd210f3ec9707/raw/a35e9c4f72970911deeb8fc488b256ca7d19ae24/cad2a_2022_random_draw.py">cad a 抽點</a></p>
-<p><a href="/get_page/Brython?src=https://gist.githubusercontent.com/mdecycu/2c6323eff49b496d1bafd210f3ec9707/raw/a35e9c4f72970911deeb8fc488b256ca7d19ae24/cad2b_2022_random_draw.py">cad b 抽點</a></p><h2>Control</h2>
+<p><a href="/get_page/Brython?src=https://gist.githubusercontent.com/mdecycu/2c6323eff49b496d1bafd210f3ec9707/raw/a35e9c4f72970911deeb8fc488b256ca7d19ae24/cad2b_2022_random_draw.py">cad b 抽點</a></p><h2>NX</h2>
+<p>File -&gt; Utilities -&gt; Customer Defaults -&gt; General -&gt; Miscellaneous -&gt; Product Excellence Program</p>
+<h2>Control</h2>
 <p><a href="https://github.com/sooryamsharma/Hand-Gesture-Controlled-Drone">https://github.com/sooryamsharma/Hand-Gesture-Controlled-Drone</a></p>
 <p></p><h1>About</h1>
 <p>這裡是 <a href="https://mde.tw">https://mde.tw</a> 課程教學的 replit 線上動態網站, 主要用來公布與上課進度有關的短暫訊息內容, 通常只有在上課時段才會開啟.</p>
@@ -534,6 +549,22 @@ cert = fullchain.pem
 key = privkey.pem
 TIMEOUTclose = 0</pre>
 <p>/etc/init.d/stunnel4 restart</p>
+<p>Add bulk user in Ubuntu:</p>
+<p><a href="https://www.tutorialspoint.com/how-to-create-multiple-user-accounts-in-linux">https://www.tutorialspoint.com/how-to-create-multiple-user-accounts-in-linux</a></p>
+<hr/>
+<p>Get user id:<br/><br/>cut -d: -f1,3 /etc/passwd<br/><br/>    -d: sets the delimiter as : for cut<br/><br/>    -f1,3 extracts the field 1 and 3 only delimited by : from the /etc/passwd file</p>
+<hr/>
+<p>Create new user:</p>
+<p>users.txt</p>
+<p style="padding-left: 30px;">user_1:password_2:1002:1002:user_1:/home/user_1:/bin/bash</p>
+<p>sudo newusers users.txt</p>
+<hr/>
+<p>Get IPv6 address:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import socket
+
+ip = socket.getaddrinfo("stud.cycu.org", 0, socket.AF_INET6)[0][4][0]
+
+print(ip)</pre>
 <p></p><h2>mde</h2>
 <p><a href="https://web.archive.org/web/19981202031321/http://www.mde.nhit.edu.tw/">https://web.archive.org/web/19981202031321/http://www.mde.nhit.edu.tw/</a></p><h1>TCExam_error</h1>
 <p>ATTENTION: [8192] htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated | LINE: 793 | FILE: C:\tcexam\tcexam\admin\code\tce_edit_answer.php</p>
