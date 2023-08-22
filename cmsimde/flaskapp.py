@@ -5,7 +5,6 @@
 
 from flask import Flask, send_from_directory, request, redirect, \
     render_template, session, make_response, url_for, flash
-# to install flask_cors use "python -m pip install flask_cors"
 from flask_cors import CORS
 import random
 import math
@@ -39,8 +38,6 @@ sys.setrecursionlimit(1000000)
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
-# 原先使用的 __file__ 所在目錄
-#_curdir = os.path.join(os.getcwd(), os.path.dirname(__file__))
 _curdir = os.path.join(os.getcwd(), parentdir)
 import init
 # for start_static function
@@ -57,6 +54,9 @@ except:
 
 # 產生亂數 token 需要 random 與 string 模組
 import string
+
+# for start_static to get wan address
+import socket
 
 # 由 init.py 中的 uwsgi = False 或 True 決定在 uwsgi 模式或近端模式執行
 
@@ -103,6 +103,7 @@ def acpform():
     
     """acp form routine
     """
+
     head, level, page = parse_content()
     directory = render_menu(head, level, page)
     if not isAdmin():
@@ -117,13 +118,16 @@ def acpform():
                 Commit Messages:<textarea name='commit' rows='1' cols='80'></textarea> \
     <input type='submit' value='acp'></form> \
     </section></div></body></html>"
+
+
 def password_generator(size=4, chars=string.ascii_lowercase + string.digits):
-    
+
     """Generate random password
     """
+
     return ''.join(random.choice(chars) for _ in range(size))
 
-    
+
 # 定義 password_generator() 後就可以產生 token
 token = password_generator()
 @app.route('/checkLogin', methods=['POST'])
@@ -133,7 +137,11 @@ def checkLogin():
     """
 
     password = request.form["password"]
-    site_title, saved_password = parse_config()
+    # for Replit, need to setup on the secrets tab for key "config"
+    if os.getenv("config") != None:
+        saved_password = os.getenv("config")
+    else:
+        site_title, saved_password = parse_config()
     hashed_password = hashlib.sha512(password.encode('utf-8')).hexdigest()
     if hashed_password == saved_password:
         # 為了讓多 cmsimde 可以在同一個瀏覽器共存, 因此讓每一個 session 不同
@@ -147,6 +155,7 @@ def checkMath():
 
     """Use LaTeX Equation rendering
     """
+
     outstring = '''
 <!-- 啟用 LaTeX equations 編輯 -->
   <!-- <script>
@@ -164,12 +173,15 @@ def correct_url():
     """get the correct url for http and https edit mode
         to replace original request.url under set_admin_css, set_css and set_footer
     """
+
     url = request.url
     if request.is_secure:
         return url
     else:
         url = url.replace("http://", "https://", 1)
         return url
+
+
 @app.route('/delete_file', methods=['POST'])
 def delete_file():
 
@@ -210,7 +222,7 @@ def doDelete():
 
     """Action to delete user uploaded files
     """
-    
+
     if not isAdmin():
         return redirect("/login")
     # delete files
@@ -244,7 +256,7 @@ def doDelete():
 @app.route('/doAcp', methods=['POST'])
 def doAcp():
 
-    """Action to search content.htm using keyword
+    """Action to execute actForm inputs
     """
 
     if not isAdmin():
@@ -263,14 +275,12 @@ def doAcp():
                    directory + "</nav><section><h1>Acp done</h1>Acp done</section></div></body></html>"
 
 
-
-
 @app.route('/doSearch', methods=['POST'])
 def doSearch():
-    
+
     """Action to search content.htm using keyword
     """
-    
+
     if not isAdmin():
         return redirect("/login")
     else:
@@ -300,9 +310,9 @@ def download():
     if type == "files":
         return send_from_directory(download_dir, filename=filename)
     else:
-    # for image files
+        # for image files
         return send_from_directory(image_dir, filename=filename)
-    
+
 
 @app.route('/download_list', methods=['GET'])
 def download_list():
@@ -325,15 +335,15 @@ def download_list():
             item_per_page = 10
         else:
             item_per_page = request.args.get('item_per_page')
-        
+
         # only use lower case keyword to search filename
         session.pop('download_keyword', "")
-        
+
         if not request.args.get('keyword'):
             keyword = ""
         else:
             keyword = request.args.get('keyword')
-        
+
         session['download_keyword'] = keyword
         # turn all english char of the filenames into lower cases
         origFiles = os.listdir(download_dir)
@@ -452,10 +462,10 @@ def download_list():
 
 
 def downloadlist_access_list(files, starti, endi):
-    
+
     """List files function for download_list
     """
-    
+
     # different extension files, associated links were provided
     # popup window to view images, video or STL files, other files can be downloaded directly
     # files are all the data to list, from starti to endi
@@ -498,6 +508,7 @@ def downloads(path):
     """
 
     return send_from_directory(_curdir+"/downloads/", path)
+
 
 def downloadselect_access_list(files, starti, endi):
 
@@ -566,10 +577,10 @@ def edit_page(edit):
 
 
 def editorfoot():
-    
+
     """Add editor foot html
     """
-    
+
     return '''<body>'''
 
 
@@ -577,6 +588,7 @@ def editorhead():
     
     """Add editor head html
     """
+
     return '''
     <br />
 <!--<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>-->
@@ -636,10 +648,10 @@ function cmsFilePicker(callback, value, meta) {
 
 @app.route('/error_log')
 def error_log(self, info="Error"):
-    
+
     """ Return error log
     """
-    
+
     head, level, page = parse_content()
     directory = render_menu(head, level, page)
     return set_css() + "<div class='container'><nav>" + \
@@ -648,16 +660,18 @@ def error_log(self, info="Error"):
 
 @app.route('/favicon.ico')
 def favicon():
-    
+
     """Add favicon
     """
-    
+
     return send_from_directory(_curdir, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
 def file_get_contents(filename):
-    
+
     """Return filename content
     """
-    
+
     # open file in utf-8 and return file content
     with open(filename, encoding="utf-8") as file:
         return file.read()
@@ -665,10 +679,10 @@ def file_get_contents(filename):
 
 # 與 file_selector 配合, 用於 Tinymce4 編輯器的檔案選擇
 def file_lister(directory, type=None, page=1, item_per_page=10):
-    
+
     """Return file list
     """
-    
+
     files = os.listdir(directory)
     total_rows = len(files)
     totalpage = math.ceil(total_rows/int(item_per_page))
@@ -784,10 +798,10 @@ def file_lister(directory, type=None, page=1, item_per_page=10):
 # 配合 Tinymce4 讓使用者透過 html editor 引用所上傳的 files 與 images
 @app.route('/file_selector', methods=['GET'])
 def file_selector():
-    
+
     """Return file selected
     """
-    
+
     if not isAdmin():
         return redirect("/login")
     else:
@@ -816,10 +830,10 @@ def file_selector():
 
 
 def file_selector_script():
-    
+
     """Return file selector Javascript
     """
-    
+
     return '''
 <script language="javascript" type="text/javascript">
 $(function(){
@@ -840,10 +854,10 @@ function setLink (url, objVals) {
 @app.route('/fileaxupload', methods=['POST'])
 # ajax jquery chunked file upload for flask
 def fileaxupload():
-    
+
     """Write uploaded file to server
     """
-    
+
     if isAdmin():
         # need to consider if the uploaded filename already existed.
         # right now all existed files will be replaced with the new files
@@ -863,10 +877,10 @@ def fileaxupload():
 @app.route('/fileuploadform', defaults={'edit':1})
 @app.route('/fileuploadform/<path:edit>')
 def fileuploadform(edit):
-    
+
     """Return file upload form html
     """
-    
+
     if isAdmin():
         head, level, page = parse_content()
         directory = render_menu(head, level, page)
@@ -876,7 +890,7 @@ def fileuploadform(edit):
 <script src="/static/axuploader.js" type="text/javascript"></script>
 <script>
 $(document).ready(function(){
-$('.prova').axuploader({url:'fileaxupload', allowExt:['jpg','png','gif','7z','pdf','zip','flv','stl','swf'],
+$('.prova').axuploader({url:'fileaxupload', allowExt:['jpg','png','gif','7z','pdf','zip','ttt','stl','txt','html','mp4'],
 finish:function(x,files)
     {
         alert('All files have been uploaded: '+files);
@@ -900,10 +914,10 @@ return 'downloads/';
 @app.route('/flvplayer')
 # 需要檢視能否取得 filepath 變數
 def flvplayer(filepath=None):
-    
+
     """Return old flv file viewer
     """
-    
+
     outstring = '''
 <object type="application/x-shockwave-flash" data="''' + static_dir + '''player_flv_multi.swf" width="320" height="240">
      <param name="movie" value="player_flv_multi.swf" />
@@ -992,16 +1006,18 @@ def generate_pages():
                      directory + "</nav><section><h1>Generate Pages</h1>" + \
                      "已經將網站轉為靜態網頁!" + \
                      "</section></div></body></html>"
+
+
 # seperate page need heading and edit variables, if edit=1, system will enter edit mode
 # single page edit will use ssavePage to save content, it means seperate save page
 @app.route('/get_page')
 @app.route('/get_page/<heading>', defaults={'edit': 0})
 @app.route('/get_page/<heading>/<int:edit>')
 def get_page(heading, edit):
-    
+
     """Get dynamic page content
     """
-    
+
     head, level, page = parse_content()
     directory = render_menu(head, level, page)
     if heading is None:
@@ -1061,25 +1077,14 @@ def get_page(heading, edit):
                     outstring_duplicate += outstring_list[i] + "<br /><hr>"
                 return outstring_duplicate
             else:
-            #pagedata = "<h"+level[page_order]+">"+heading+"</h"+level[page_order]+">"+search_content(head, page, heading)
-            #outstring = last_page+" "+next_page+"<br />"+ tinymce_editor(directory, html_escape(pagedata), page_order)
                 return outstring
 
 
-# seperate page need heading and edit variables, if edit=1, system will enter edit mode
-# single page edit will use ssavePage to save content, it means seperate save page
-'''
-@app.route('/get_page2')
-@app.route('/get_page2/<heading>', defaults={'edit': 0})
-@app.route('/get_page2/<heading>/<int:edit>')
-'''
-# before add tipue search function
-#def get_page2(heading, head, edit):
 def get_page2(heading, head, edit, get_page_content = None):
-    
+
     """Get page content and replace certain string for static site
     """
-    
+
     not_used_head, level, page = parse_content()
     # 直接在此將 /images/ 換為 ./../images/, /downloads/ 換為 ./../downloads/, 以 content 為基準的相對目錄設定
 
@@ -1199,17 +1204,63 @@ def get_page2(heading, head, edit, get_page_content = None):
                     outstring_duplicate += outstring_list[i] + "<br /><hr>"
                 return outstring_duplicate
             else:
-            #pagedata = "<h" + level[page_order]+">" + heading + "</h" + level[page_order] + ">" + search_content(head, page, heading)
-            #outstring = last_page + " " + next_page + "<br />" + tinymce_editor(directory, html_escape(pagedata), page_order)
                 return outstring
+
+
+def get_wan_address():
+
+    """get wide area network address
+    """
+  
+    try:
+        ipv4_address = get_wan_ipv4_address()
+        if ipv4_address:
+            return ipv4_address
+
+        ipv6_address = get_wan_ipv6_address()
+        if ipv6_address:
+            return ipv6_address
+    except socket.gaierror:
+        pass
+
+    return 'localhost'
+
+
+def get_wan_ipv4_address():
+
+    """get IPv4 wide area network address
+    """
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.connect(("8.8.8.8", 80))  # Use Google Public DNS as the external host
+        ip_address = sock.getsockname()[0]
+        sock.close()
+        return ip_address
+    except socket.error:
+        return None
+
+
+def get_wan_ipv6_address():
+
+    """get IPv6 wide area network address
+    """
+
+    try:
+        sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+        sock.connect(("2001:4860:4860::8888", 80))  # Use Google Public DNS as the external host
+        ip_address = sock.getsockname()[0]
+        sock.close()
+        return ip_address
+    except socket.error:
+        return None
 
 
 @app.route('/image_delete_file', methods=['POST'])
 def image_delete_file():
-    
+
     """Delete image file
     """
-    
+
     if not isAdmin():
         return redirect("/login")
     filename = request.form['filename']
@@ -1232,7 +1283,6 @@ def image_delete_file():
             outstring += filename[index] + "<input type='hidden' name='filename' value='" + \
                               filename[index] + "'><br />"
     outstring += "<br /><input type='submit' value='delete'></form>"
-
     return set_css() + "<div class='container'><nav>" + \
              directory + "</nav><section><h1>Download List</h1>" + \
              outstring + "<br/><br /></body></html>"
@@ -1240,10 +1290,10 @@ def image_delete_file():
 
 @app.route('/image_doDelete', methods=['POST'])
 def image_doDelete():
-    
+
     """Delete file action
     """
-    
+
     if not isAdmin():
         return redirect("/login")
     # delete files
@@ -1264,10 +1314,8 @@ def image_doDelete():
                 outstring += filename[index] + " deleted!<br />"
             except:
                 outstring += filename[index] + "Error, can not delete files!<br />"
-
     head, level, page = parse_content()
     directory = render_menu(head, level, page)
-
     return set_css() + "<div class='container'><nav>" + \
              directory + "</nav><section><h1>Image List</h1>" + \
              outstring + "<br/><br /></body></html>"
@@ -1275,10 +1323,10 @@ def image_doDelete():
 
 @app.route('/image_list', methods=['GET'])
 def image_list():
-    
+
     """List image files
     """
-    
+
     if not isAdmin():
         return redirect("/login")
     else:
@@ -1426,10 +1474,10 @@ def image_list():
 @app.route('/imageaxupload', methods=['POST'])
 # ajax jquery chunked file upload for flask
 def imageaxupload():
-    
+
     """Write uploaded image files
     """
-    
+
     if isAdmin():
         # need to consider if the uploaded filename already existed.
         # right now all existed files will be replaced with the new files
@@ -1447,10 +1495,10 @@ def imageaxupload():
 
 
 def imagelist_access_list(files, starti, endi):
-    
+
     """Access files of image direcroty
     """
-    
+
     # different extension files, associated links were provided
     # popup window to view images, video or STL files, other files can be downloaded directly
     # files are all the data to list, from starti to endi
@@ -1471,10 +1519,10 @@ def imagelist_access_list(files, starti, endi):
 
 # 與 file_selector 搭配的取影像檔程式
 def imageselect_access_list(files, starti, endi):
-    
+
     """Access selected image file
     """
-    
+
     outstring = '''<head>
 <style>
 a.xhfbfile {padding: 0 2px 0 0; line-height: 1em;}
@@ -1510,10 +1558,10 @@ a.xhfbfile:hover{
 @app.route('/imageuploadform', defaults={'edit': 1})
 @app.route('/imageuploadform/<path:edit>')
 def imageuploadform(edit):
-    
+
     """Image files upload form
     """
-    
+
     if isAdmin():
         head, level, page = parse_content()
         directory = render_menu(head, level, page)
@@ -1546,10 +1594,10 @@ return 'images/';
 
 @app.route('/')
 def index():
-    
+
     """Index page of dynamic site
     """
-    
+
     head, level, page = parse_content()
     # 2018.12.13, 將空白轉為"+" 號, 會導致連線錯誤, 改為直接取頁面標題
     #return redirect("/get_page/" + urllib.parse.quote_plus(head[0], encoding="utf-8"))
@@ -1584,10 +1632,10 @@ def index():
 
 
 def isAdmin():
-    
+
     """Check if is adminitrator
     """
-    
+
     if session.get('admin_'+token) == 1:
             return True
     else:
@@ -1597,19 +1645,19 @@ def isAdmin():
 # use to check directory variable data
 @app.route('/listdir')
 def listdir():
-    
+
     """List directory content
     """
-    
+
     return download_dir + "," + config_dir
 
 
 @app.route('/load_list')
 def load_list(item_per_page=5, page=1, filedir=None, keyword=None):
-    
+
     """Load searched files
     """
-    
+
     files = os.listdir(config_dir+filedir+"_programs/")
     if keyword is None:
         pass
@@ -1722,10 +1770,10 @@ function keywordSearch(){
 
 
 def loadlist_access_list(files, starti, endi, filedir):
-    
+
     """Access loaded file list
     """
-    
+
     # different extension files, associated links were provided
     # popup window to view images, video or STL files, other files can be downloaded directly
     # files are all the data to list, from starti to endi
@@ -1760,9 +1808,10 @@ def loadlist_access_list(files, starti, endi, filedir):
 
 @app.route('/login')
 def login():
-    
+
     """Login routine
     """
+
     head, level, page = parse_content()
     directory = render_menu(head, level, page)
     if not isAdmin():
@@ -1777,19 +1826,143 @@ def login():
 
 @app.route('/logout')
 def logout():
-    
+
     """Logout routine
     """
-    
+
     session.pop('admin_'+token , None)
     flash('已經登出!')
     return redirect(url_for('login'))
 
 
+@app.route('/local_blog')
+def local_blog():
+
+    """Generate local blog files from markdown directory
+    """
+
+    if isAdmin():
+        os.system("pelican markdown -o blog -s local_publishconf.py")
+        head, level, page = parse_content()
+        directory = render_menu(head, level, page)
+
+        return set_css() + "<div class='container'><nav>" + \
+                   directory + "</nav><section><h1>Local blog generated</h1>" + \
+                   "Blog generated!<br/><br /></body></html>"
+    else:
+        return redirect("/login")
+
+
+@app.route('/markdown_action', methods=['POST'])
+def markdown_action():
+  
+    """Action for markdown_form
+    """
+  
+    if isAdmin():
+        import html
+        markdown_dir = _curdir + "/markdown/"
+        title = request.form['title']
+        body = request.form['body']
+        # see if need to unescape back to the original html
+        body = html.unescape(body)
+        # Create the markdown directory if it doesn't exist
+        if not os.path.exists(markdown_dir):
+            os.makedirs(markdown_dir)
+
+        # Save the content to a file with the title as the filename
+        filename = os.path.join(markdown_dir, f'{title}.md')
+        with open(filename, 'w', encoding='utf-8') as file:
+            file.write(body.replace('\r\n', '\n'))
+
+        head, level, page = parse_content()
+        directory = render_menu(head, level, page)
+
+        return set_css() + "<div class='container'><nav>" + \
+                   directory + "</nav><section><h1>Markdown saved</h1>" + \
+                   filename + " saved!<br/><br /><a href='/local_blog'>local_blog</a></body></html>"
+    else:
+        return redirect("/login")
+
+
+@app.route('/markdown_form', methods=['GET'])
+def markdown_form():
+
+    """Web-based markdown file edit form
+    """
+
+    if isAdmin():
+        try:
+            file_to_edit = request.args.get('file')
+        except:
+            file_to_edit = ""
+        head, level, page = parse_content()
+        directory = render_menu(head, level, page)
+        markdown_dir = _curdir + "/markdown/"
+        filenames = [filename for filename in os.listdir(markdown_dir) if filename.endswith('.md')] if os.path.exists(markdown_dir) else []
+        file_list = 'Existed Files: '
+        for filename in filenames:
+            file_list += f'{filename}, '
+        if file_to_edit:
+            edit_filename = os.path.join(markdown_dir, file_to_edit+".md")
+        else:
+            edit_filename = ""
+        if os.path.exists(edit_filename):
+            with open(edit_filename, 'r', encoding='utf-8') as file:
+                content = file.read()
+            # need to html.escape the content
+            content = html_escape(content)
+            outstring =  file_list + '''
+            <form method="POST" action="/markdown_action">
+                <label for="title">Title:</label>
+                <input type="text" name="title" id="title" value=''' + file_to_edit+''' required>.md<br><br>
+                <label for="body">Body:</label><br>
+                <textarea name="body" id="body" rows="10" cols="50" required>'''+ content+'''</textarea><br><br>
+                <input type="submit" value="Save">
+            </form>
+            '''
+        else:
+            outstring =  file_list + '''
+            <form method="POST" action="markdown_action">
+                <label for="title">Title:</label>
+                <input type="text" name="title" id="title" required>.md<br><br>
+                <label for="body">Body:</label><br>
+                <textarea name="body" id="body" rows="10" cols="50" required>
+---
+Title: this is a template
+Date: 2023-06-17 11:00
+Category: Misc
+Tags: 2023FallCAD
+Slug: 2023-Fall-Intro-to-computer-aided-design
+Author: yen
+---
+
+this is a template.
+
+<!-- PELICAN_END_SUMMARY -->
+
+Solid Edge
+----
+<pre class="brush:jscript">
+</pre>
+<pre class="brush: python">
+</pre>
+                </textarea><br><br>
+                <input type="submit" value="Save">
+            </form>
+            '''
+        return set_css() + "<div class='container'><nav>" + \
+           directory + "</nav><section><h1>Markdown form</h1>" + \
+           outstring + "</body></html>"
+    else:
+        return redirect("/login")
+
+
 def parse_config():
-    
+
     """Parse config
     """
+
     # if there is no config/config automatically generate one with content "admin"
     if not os.path.isfile(config_dir+"config"):
         # create config file if there is no config file
@@ -1813,10 +1986,10 @@ def parse_config():
 
 
 def _remove_h123_attrs(soup):
-    
+
     """Remove h1-h3 tag attribute
     """
-    
+
     tag_order = 0
     for tag in soup.find_all(['h1', 'h2', 'h3']):
         # 假如標註內容沒有字串
@@ -1865,11 +2038,12 @@ def _remove_h123_attrs(soup):
 
     return soup
 
+
 def parse_content():
-    
+
     """Use bs4 and re module functions to parse content.htm
     """
-    
+
     #from pybean import Store, SQLiteWriter
     # if no content.db, create database file with cms table
     '''
@@ -1953,11 +2127,24 @@ def parse_content():
     return head_list, level_list, page_list
 
 
+def remove_special_characters(text):
+    
+    """Removes special characters from the given text.
+    """
+    # Define the set of special characters to remove
+    special_chars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '[', ']', '{', '}', '|', '\\', '/',
+                     ':', ';', '<', '>', ',', '.', '?', '`', '~', "'", '"']
+    # Remove special characters from the text
+    cleaned_text = ''.join(char for char in text if char not in special_chars)
+
+    return cleaned_text
+
+
 def render_menu(head, level, page, sitemap=0):
     
     """允許使用者在 h1 標題後直接加上 h3 標題, 或者隨後納入 h4 之後作為標題標註
-     """
-    
+    """
+
     directory = ""
     # 從 level 數列第一個元素作為開端
     current_level = level[0]
@@ -2011,10 +2198,10 @@ def render_menu(head, level, page, sitemap=0):
 
 
 def render_menu2(head, level, page, sitemap=0):
-    
+
     """Render menu for static site
     """
-    
+
     site_title, password = parse_config()
     directory = '''
     <div class="site-wrap">
@@ -2064,7 +2251,7 @@ def render_menu2(head, level, page, sitemap=0):
     directory += '''
                         <li class="active has-children"><a href="index.html">Home</a>
                         <ul class="dropdown">
-                            <li><a href="sitemap.html">Site Map</a></li>
+                            <li><a href="sitemap.html">SMap</a></li>
                             <li><a href="./../reveal/index.html">reveal</a></li>
                             <li><a href="./../blog/index.html">blog</a></li>
                         </ul>
@@ -2144,10 +2331,10 @@ def render_menu2(head, level, page, sitemap=0):
 
 
 def render_menu3(head, level, page, sitemap=0):
-    
+
     """Render menu for static sitemap
     """
-    
+
     directory = ""
     current_level = level[0]
     if sitemap:
@@ -2199,10 +2386,10 @@ def render_menu3(head, level, page, sitemap=0):
 
 @app.route('/saveConfig', methods=['POST'])
 def saveConfig():
-    
+
     """Save Config setup file
     """
-    
+
     if not isAdmin():
         return redirect("/login")
     site_title = request.form['site_title']
@@ -2236,10 +2423,10 @@ def saveConfig():
 
 @app.route('/savePage', methods=['POST'])
 def savePage():
-    
+
     """Save all pages function
     """
-    
+
     page_content = request.form['page_content']
     # when element_format : "html", need to remove the annoying comment to prevent brython exec
     page_content = page_content.replace('// <![CDATA[', '')
@@ -2259,30 +2446,8 @@ def savePage():
     return redirect("/edit_page")
 
 
-# use head title to search page content
-'''
-# search_content(head, page, search)
-# 從 head 與 page 數列中, 以 search 關鍵字進行查詢
-# 原先傳回與 search 關鍵字頁面對應的頁面內容
-# 現在則傳回多重的頁面次序與頁面內容數列
-find = lambda searchList, elem: [[i for i, x in enumerate(searchList) if x == e] for e in elem]
-head = ["標題一","標題二","標題三","標題一","標題四","標題五"]
-search_result = find(head,["標題一"])[0]
-page_order = []
-page_content = []
-for i in range(len(search_result)):
-    # 印出次序
-    page_order.append(search_result[i])
-    # 標題為 head[search_result[i]]
-    #  頁面內容則為 page[search_result[i]]
-    page_content.append(page[search_result[i]])
-    # 從 page[次序] 印出頁面內容
-# 準備傳回 page_order 與 page_content 等兩個數列
-'''
-
-
 def search_content(head, page, search):
-    
+
     """Search content
     """
 
@@ -2304,10 +2469,10 @@ def search_content(head, page, search):
 @app.route('/search_form', defaults={'edit': 1})
 @app.route('/search_form/<path:edit>')
 def search_form(edit):
-    
+
     """Form of keyword search
     """
-    
+
     if isAdmin():
         head, level, page = parse_content()
         directory = render_menu(head, level, page)
@@ -2324,14 +2489,13 @@ def search_form(edit):
 # setup static directory
 @app.route('/static/<path:path>')
 def send_file(path):
-    
+
     """Send file function
     """
+    
     return app.send_static_file(static_dir + path)
 
 
-# setup static directory
-#@app.route('/images/<path:path>')
 @app.route('/images/<path:path>')
 def send_images(path):
     
@@ -2344,19 +2508,25 @@ def send_images(path):
 # setup static directory
 @app.route('/static/')
 def send_static():
-    
+
     """Send static files
     """
-    
+
     return app.send_static_file('index.html')
 
 
 # set_admin_css for administrator
 def set_admin_css():
-    
+
     """Set css for admin
     """
-    
+
+    server_ip = get_wan_address() or 'localhost'
+    if "." in server_ip:
+        server_address = str(server_ip) + ":" + str(static_port)
+    else:
+        server_address = "[" + str(server_ip) + "]:" + str(static_port)
+
     outstring = '''<!doctype html>
 <html><head>
 <meta http-equiv="content-type" content="text/html;charset=utf-8">
@@ -2387,24 +2557,24 @@ window.location= 'https://' + location.host + location.pathname + location.searc
 <confmenu>
 <ul>
 <li><a href="/">Home</a></li>
-<li><a href="/sitemap">SiteMap</a></li>
-<li><a href="/edit_page">Edit All</a></li>
+<li><a href="/sitemap">SMap</a></li>
+<li><a href="/edit_page">EditA</a></li>
 <li><a href="''' + str(correct_url()) + '''/1">Edit</a></li>
 <li><a href="/edit_config">Config</a></li>
 <li><a href="/search_form">Search</a></li>
-<li><a href="/imageuploadform">Image Upload</a></li>
-<li><a href="/image_list">Image List</a></li>
-<li><a href="/fileuploadform">File Upload</a></li>
-<li><a href="/download_list">File List</a></li>
+<li><a href="/imageuploadform">IUpload</a></li>
+<li><a href="/image_list">IList</a></li>
+<li><a href="/fileuploadform">FUpload</a></li>
+<li><a href="/download_list">FList</a></li>
 <li><a href="/logout">Logout</a></li>
-<li><a href="/generate_pages">generate_pages</a></li>
+<li><a href="/generate_pages">Convert</a></li>
 '''
     # under uwsgi mode no start_static and static_port anchor links
     if uwsgi != True:
         outstring += '''
 <li><a href="/acpform">acp</a></li>
-<li><a href="/start_static">start_static</a></li>
-<li><a href="https://localhost:''' + str(static_port) +'''">''' + str(static_port) + '''</a></li>
+<li><a href="/start_static/">SStatic</a></li>
+<li><a href="https://'''+ server_address + '''">''' + str(static_port) + '''</a></li>
 '''
     outstring += '''
 </ul>
@@ -2414,9 +2584,16 @@ window.location= 'https://' + location.host + location.pathname + location.searc
 
 
 def set_css():
-    
+
     """Set css for dynamic site
     """
+
+    server_ip = get_wan_address() or 'localhost'
+    if "." in server_ip:
+        server_address = str(server_ip) + ":" + str(static_port)
+    else:
+        server_address = "[" + str(server_ip) + "]:" + str(static_port)
+
     outstring = '''<!doctype html>
 <html><head>
 <meta http-equiv="content-type" content="text/html;charset=utf-8">
@@ -2452,32 +2629,32 @@ window.location= 'https://' + location.host + location.pathname + location.searc
 <confmenu>
 <ul>
 <li><a href="/">Home</a></li>
-<li><a href="/sitemap">Site Map</a></li>
+<li><a href="/sitemap">SMap</a></li>
 '''
     if isAdmin():
         outstring += '''
-<li><a href="/edit_page">Edit All</a></li>
+<li><a href="/edit_page">EditA</a></li>
 <li><a href="''' + str(correct_url()) + '''/1">Edit</a></li>
 <li><a href="/edit_config">Config</a></li>
 <li><a href="/search_form">Search</a></li>
-<li><a href="/imageuploadform">image upload</a></li>
-<li><a href="/image_list">image list</a></li>
-<li><a href="/fileuploadform">file upload</a></li>
-<li><a href="/download_list">file list</a></li>
-<li><a href="/logout">logout</a></li>
-<li><a href="/generate_pages">generate_pages</a></li>
+<li><a href="/imageuploadform">IUpload</a></li>
+<li><a href="/image_list">IList</a></li>
+<li><a href="/fileuploadform">FUpload</a></li>
+<li><a href="/download_list">FList</a></li>
+<li><a href="/logout">Logout</a></li>
+<li><a href="/generate_pages">Convert</a></li>
 '''
         # under uwsgi mode no start_static and static_port  anchor links
         # only added when user login as admin
         if uwsgi != True:
             outstring += '''
 <li><a href="/acpform">acp</a></li>
-<li><a href="/start_static">start_static</a></li>
-<li><a href="https://localhost:''' + str(static_port) +'''">''' + str(static_port) + '''</a></li>
+<li><a href="/start_static/">SStatic</a></li>
+<li><a href="https://''' + server_address +'''">''' + str(static_port) + '''</a></li>
 '''
     else:
         outstring += '''
-<li><a href="/login">login</a></li>
+<li><a href="/login">Login</a></li>
 '''
     outstring += '''
 </ul>
@@ -2487,10 +2664,10 @@ window.location= 'https://' + location.host + location.pathname + location.searc
 
 
 def set_css2():
-    
+
     """Set css for static site
     """
-    
+
     static_head = '''
         <head>
         <title>''' + init.Init.site_title + '''</title>
@@ -2568,39 +2745,41 @@ window.location= 'https://' + location.host + location.pathname + location.searc
 
 
 def set_footer():
-    
+
     """Footer for page
     """
-    
+
     return "<footer> \
-        <a href='/edit_page'>Edit All</a>| \
+        <a href='/edit_page'>EditA</a>| \
         <a href='" + str(correct_url) + "/1'>Edit</a>| \
         <a href='edit_config'>Config</a> \
-        <a href='login'>login</a>| \
-        <a href='logout'>logout</a> \
+        <a href='login'>Login</a>| \
+        <a href='logout'>Logout</a> \
         <br />Powered by <a href='http://cmsimple.cycu.org'>CMSimply</a> \
         </footer> \
         </body></html>"
+
+
 @app.route('/sitemap', defaults={'edit': 1})
 @app.route('/sitemap/<path:edit>')
 def sitemap(edit):
-    
+
     """Sitemap for dynamic site
     """
-    
+
     head, level, page = parse_content()
     directory = render_menu(head, level, page)
     sitemap = render_menu(head, level, page, sitemap=1)
     return set_css() + "<div class='container'><nav>" + directory + \
-             "</nav><section><h1>Site Map</h1>" + sitemap + \
+             "</nav><section><h1>SMap</h1>" + sitemap + \
              "</section></div></body></html>"
 
 
 def sitemap2(head):
-    
+
     """Sitemap for static content generation
     """
-    
+
     edit = 0
     not_used_head, level, page = parse_content()
     directory = render_menu2(head, level, page)
@@ -2608,15 +2787,15 @@ def sitemap2(head):
     sitemap = render_menu3(head, level, page, sitemap=1)
     # add tipue search id
     return set_css2() + "<div class='container'><nav>" + directory + \
-             "</nav><section><h1>Site Map</h1><div id=\"tipue_search_content\"></div>" + sitemap + \
+             "</nav><section><h1>SMap</h1><div id=\"tipue_search_content\"></div>" + sitemap + \
              "</section></div></body></html>"
 
 
 def sizeof_fmt(num):
-    
+
     """Size formate
     """
-    
+
     for x in ['bytes','KB','MB','GB']:
         if num < 1024.0:
             return "%3.1f%s" % (num, x)
@@ -2626,10 +2805,10 @@ def sizeof_fmt(num):
 
 @app.route('/ssavePage', methods=['POST'])
 def ssavePage():
-    
+
     """Seperate save page function
     """
-    
+
     page_content = request.form['page_content']
     # add an action for submit general save or collaborative csave
     # default value for action is "save", this is for editor menu Save button
@@ -2703,25 +2882,42 @@ def ssavePage():
 
 @app.route('/start_static/')
 def start_static():
-    # build directory
-    #os.chdir("./../")
-    server_address = ('localhost', static_port)
-    httpd = http.server.HTTPServer(server_address, http.server.SimpleHTTPRequestHandler)
-    httpd.socket = ssl.wrap_socket(httpd.socket,
-                                   server_side=True,
-                                   certfile='./localhost.crt',
-                                   keyfile='./localhost.key',
-                                   ssl_version=ssl.PROTOCOL_TLSv1_2)
-    #print(os.getcwd())
-    #print(static_port + " https server started")
-    httpd.serve_forever()
 
+    """Start local static server
+    """
 
+    if isAdmin():
+        server_address = get_wan_address() or 'localhost'
+        server_port = static_port
+
+        # Determine address family based on server_address
+        address_family = socket.AF_INET if ':' not in server_address else socket.AF_INET6
+
+        httpd = http.server.HTTPServer((server_address, server_port), http.server.SimpleHTTPRequestHandler, bind_and_activate=False)
+        httpd.socket = socket.socket(address_family, socket.SOCK_STREAM)
+        httpd.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        if address_family == socket.AF_INET6:
+            httpd.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+            httpd.socket.bind((server_address, server_port, 0, 0))
+        else:
+            httpd.socket.bind((server_address, server_port))
+
+        httpd.socket = ssl.wrap_socket(httpd.socket,
+                                       server_side=True,
+                                       certfile='./localhost.crt',
+                                       keyfile='./localhost.key',
+                                       ssl_version=ssl.PROTOCOL_TLSv1_2)
+
+        httpd.server_activate()
+        httpd.serve_forever()
+    else:
+        return redirect("/login")
 def syntaxhighlight():
-    
+
     """Return syntaxhighlight needed scripts
     """
-    
+
     return '''
 <script type="text/javascript" src="/static/syntaxhighlighter/shCore.js"></script>
 <script type="text/javascript" src="/static/syntaxhighlighter/shBrushBash.js"></script>
@@ -2735,6 +2931,7 @@ def syntaxhighlight():
 <script type="text/javascript" src="/static/syntaxhighlighter/shBrushPhp.js"></script>
 <script type="text/javascript" src="/static/syntaxhighlighter/shBrushPowerShell.js"></script>
 <script type="text/javascript" src="/static/syntaxhighlighter/shBrushLua.js"></script>
+<script type="text/javascript" src="/static/syntaxhighlighter/shBrushMojo.js"></script>
 <script type="text/javascript" src="/static/syntaxhighlighter/shBrushCpp.js"></script>
 <script type="text/javascript" src="/static/syntaxhighlighter/shBrushCss.js"></script>
 <script type="text/javascript" src="/static/syntaxhighlighter/shBrushCSharp.js"></script>
@@ -2761,10 +2958,10 @@ img.add_border {
 
 
 def syntaxhighlight2():
-    
+
     """Return syntaxhighlight for static pages
     """
-    
+
     return '''
 <script type="text/javascript" src="./../cmsimde/static/syntaxhighlighter/shCore.js"></script>
 <script type="text/javascript" src="./../cmsimde/static/syntaxhighlighter/shBrushBash.js"></script>
@@ -2778,6 +2975,7 @@ def syntaxhighlight2():
 <script type="text/javascript" src="./../cmsimde/static/syntaxhighlighter/shBrushPhp.js"></script>
 <script type="text/javascript" src="./../cmsimde/static/syntaxhighlighter/shBrushPowerShell.js"></script>
 <script type="text/javascript" src="./../cmsimde/static/syntaxhighlighter/shBrushLua.js"></script>
+<script type="text/javascript" src="./../cmsimde/static/syntaxhighlighter/shBrushMojo.js"></script>
 <script type="text/javascript" src="./../cmsimde/static/syntaxhighlighter/shBrushCpp.js"></script>
 <script type="text/javascript" src="./../cmsimde/static/syntaxhighlighter/shBrushCss.js"></script>
 <script type="text/javascript" src="./../cmsimde/static/syntaxhighlighter/shBrushCSharp.js"></script>
@@ -2804,10 +3002,10 @@ img.add_border {
 
 
 def tinymce_editor(menu_input=None, editor_content=None, page_order=None):
-    
+
     """Tinymce editor scripts
     """
-    
+
     sitecontent =file_get_contents(config_dir + "content.htm")
     editor = set_admin_css() + editorhead() + '''</head>''' + editorfoot()
     # edit all pages
@@ -2973,10 +3171,10 @@ def tinymce_editor(menu_input=None, editor_content=None, page_order=None):
     return outstring
     
 def unique(items):
-    
+
     """Make items element unique
     """
-    
+
     found = set([])
     keep = []
     count = {}
@@ -2991,32 +3189,11 @@ def unique(items):
     return keep
 
 
-# for merging two lists and preserve the duplicated elements
-'''
-def merge_sequences(seq1,seq2):
-    sm=SequenceMatcher(a=seq1,b=seq2)
-    res = []
-    for (op, start1, end1, start2, end2) in sm.get_opcodes():
-        if op == 'equal' or op=='delete':
-            #This range appears in both sequences, or only in the first one.
-            res += seq1[start1:end1]
-        elif op == 'insert':
-            #This range appears in only the second sequence.
-            res += seq2[start2:end2]
-        elif op == 'replace':
-            #There are different ranges in each sequence - add both.
-            res += seq1[start1:end1]
-            res += seq2[start2:end2]
-    return res
-
-'''
-
-
 def merge_sequences(list1, list2):
-    
+
     """Merge sequences
     """
-    
+
     # Exit if list2 is empty
     if not len(list2):
         return list1
@@ -3057,10 +3234,10 @@ def merge_sequences(list1, list2):
 
 # replace slash n with slash r
 def snTosr(tag):
-    
+
     """Replace slash n with slash r
     """
-    
+
     tagStr = str(tag)
     # 只要編輯區標註有跳行內容者, 都需要轉換跳行符號
     if tag.name in ["pre", "script"]:
